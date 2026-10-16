@@ -1,0 +1,47 @@
+/*
+ * Archivo (SIL OFL 1.1, Omnibus-Type), self-hosted, Latin subset.
+ * Both files are cut from the Fontsource variable build (see LICENSES.md):
+ *   archivo-expanded-800.woff2  static instance, wdth 125, wght 800 (display; the one preloaded file)
+ *   archivo-400-500.woff2       variable, wdth 100, wght 400 to 500 (body)
+ * font-display: optional means a slow font never swaps in late; the metric-matched
+ * fallback faces below make the fallback render occupy the same space.
+ */
+@font-face {
+  font-family: 'Archivo Expanded';
+  src: url('./fonts/archivo-expanded-800.woff2') format('woff2');
+  font-weight: 800;
+  font-style: normal;
+  font-display: optional;
+}
+
+@font-face {
+  font-family: 'Archivo';
+  src: url('./fonts/archivo-400-500.woff2') format('woff2-variations');
+  font-weight: 400 500;
+  font-style: normal;
+  font-display: optional;
+}
+
+/*
+ * Fallback metrics. Archivo: unitsPerEm 1000, ascent 878, descent 210, lineGap 0.
+ * size-adjust = Archivo average advance / Arial average advance over the hero copy;
+ * overrides are divided by size-adjust (the same maths fontaine/capsize use).
+ */
+@font-face {
+  font-family: 'Archivo Fallback';
+  src: local('Arial'), local('ArialMT');
+  size-adjust: 100.2%;
+  ascent-override: 87.6%;
+  descent-override: 20.96%;
+  line-gap-override: 0%;
+}
+
+@font-face {
+  font-family: 'Archivo Expanded Fallback';
+  src: local('Arial Bold'), local('Arial-BoldMT');
+  font-weight: 800;
+  size-adjust: 127.6%;
+  ascent-override: 68.81%;
+  descent-override: 16.46%;
+  line-gap-override: 0%;
+}

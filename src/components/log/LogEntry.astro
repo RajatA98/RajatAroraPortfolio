@@ -1,0 +1,252 @@
+---
+// One Captain's Log entry, fully expanded (no JS, nothing hidden from
+// crawlers). CONTRACT: props `id` (collection id, used for the `log-${id}`
+// anchor) and `study` (validated CaseStudy).
+//
+// Order: title, tagline, stack strip, the one cleared number (if any), then
+// Problem, The hard part (ending in the marked Decision), Outcome, then the
+// diagram (repo entries) and the links row. A classified entry keeps its
+// public prose, carries a quiet "Classified" label and a redaction bar in
+// place of links, and never renders links even if some are present.
+import type { CaseStudy } from '../../data/case-study';
+
+interface Props {
+  id: string;
+  study: CaseStudy;
+}
+const { id, study } = Astro.props;
+
+const anchor = `log-${id}`;
+const titleId = `${anchor}-title`;
+const isClassified = study.kind === 'classified' || study.redacted;
+const figure = study.figure?.cleared ? study.figure : null;
+
+const links = isClassified
+  ? []
+  : [
+      { href: study.links.live, label: 'Open the app' },
+      { href: study.links.appStore, label: 'View on the App Store' },
+      { href: study.links.github, label: 'Source on GitHub' },
+    ].filter((l): l is { href: string; label: string } => !!l.href);
+
+const diagram = !isClassified && study.links.diagram ? study.links.diagram : null;
+---
+<article id={anchor} class:list={['entry', { classified: isClassified }]} aria-labelledby={titleId}>
+  <header class="head">
+    {isClassified && <p class="classified-label">Classified</p>}
+    <h3 id={titleId}>{study.title}</h3>
+    <p class="tagline">{study.tagline}</p>
+    <ul class="stack" role="list" aria-label="Stack">
+      {study.stack.map((s) => <li>{s}</li>)}
+    </ul>
+  </header>
+
+  {
+    figure && (
+      <p class="figure" data-figure>
+        <span class="figure-value">{figure.value}</span>
+        <span class="figure-note">{figure.note}</span>
+      </p>
+    )
+  }
+
+  <div class="parts">
+    <div class="part">
+      <h4>Problem</h4>
+      <p>{study.problem}</p>
+    </div>
+    <div class="part">
+      <h4>The hard part</h4>
+      <p>{study.hardPart}</p>
+      <p class="decision" data-decision>
+        <strong class="decision-label">Decision</strong>
+        <span>{study.decision}</span>
+      </p>
+    </div>
+    <div class="part">
+      <h4>Outcome</h4>
+      <p>{study.outcome}</p>
+    </div>
+  </div>
+
+  {
+    isClassified && (
+      <div class="withheld">
+        <span class="redaction" data-redaction aria-hidden="true">
+          <span class="bar" />
+          <span class="bar short" />
+        </span>
+        <p class="visually-hidden">Details withheld.</p>
+      </div>
+    )
+  }
+
+  {
+    diagram && (
+      <img
+        class="diagram"
+        src={diagram}
+        width="1180"
+        height="780"
+        loading="lazy"
+        decoding="async"
+        alt={`Architecture diagram: ${study.title}`}
+      />
+    )
+  }
+
+  {
+    links.length > 0 && (
+      <ul class="links" role="list">
+        {links.map((l) => (
+          <li>
+            <a href={l.href} target="_blank" rel="noopener">
+              {l.label}
+              <span class="visually-hidden"> (opens in a new tab)</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</article>
+
+<style>
+  .entry {
+    display: grid;
+    gap: var(--s-5);
+    padding-block: var(--s-6) var(--s-7);
+    border-top: var(--rule);
+    scroll-margin-top: var(--s-6);
+  }
+
+  .head {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  h3 {
+    font-size: var(--t-2);
+    overflow-wrap: anywhere;
+  }
+
+  .tagline {
+    font-size: var(--t-1);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .stack {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    list-style: none;
+    color: var(--ink-60);
+    font-size: var(--t-small);
+  }
+
+  .stack li:not(:last-child)::after {
+    content: ',\00a0';
+  }
+
+  /* The one cleared number: sun is a fill only, ink text on top. */
+  .figure {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: var(--s-2) var(--s-3);
+  }
+
+  .figure-value {
+    padding: var(--s-1) var(--s-2);
+    border-radius: var(--r);
+    background: var(--sun);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: var(--t-2);
+    letter-spacing: var(--track-display);
+    line-height: 1;
+  }
+
+  .figure-note {
+    color: var(--ink);
+  }
+
+  .parts {
+    display: grid;
+    gap: var(--s-5);
+  }
+
+  .part {
+    display: grid;
+    gap: var(--s-2);
+  }
+
+  h4 {
+    font-size: var(--t-small);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .decision {
+    padding-left: var(--s-4);
+    border-left: var(--rule);
+  }
+
+  .decision-label {
+    display: block;
+    font-size: var(--t-small);
+    font-weight: 700;
+  }
+
+  .classified-label {
+    justify-self: start;
+    padding: 0 var(--s-2);
+    border: var(--rule);
+    border-radius: var(--r);
+    color: var(--ink);
+    font-size: var(--t-small);
+    font-weight: 700;
+    line-height: 1.6;
+  }
+
+  .redaction {
+    display: grid;
+    gap: var(--s-2);
+    max-width: 28rem;
+  }
+
+  .bar {
+    display: block;
+    height: 0.9em;
+    border-radius: var(--r);
+    background: var(--ink);
+  }
+
+  .bar.short {
+    width: 62%;
+  }
+
+  .diagram {
+    width: 100%;
+    max-width: 48rem;
+    height: auto;
+    border-radius: var(--r);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--s-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-weight: 500;
+  }
+</style>

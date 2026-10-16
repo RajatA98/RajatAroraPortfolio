@@ -1,0 +1,54 @@
+---
+// Thin ruled band: name mark left, the three actions right. Static, solid, no blur.
+// The name is plain text, not a link, so Tab goes skip link, then the three actions.
+import ActionBar from './ActionBar.astro';
+import { name } from '../data/site';
+---
+<header class="site-header">
+  <div class="wrap row">
+    <p class="mark">{name}</p>
+    <ActionBar variant="header" />
+  </div>
+</header>
+
+<style>
+  .site-header {
+    background: var(--chart);
+    border-bottom: var(--rule);
+  }
+
+  .row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--s-3);
+    min-height: 3.5rem;
+  }
+
+  .mark {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: var(--track-display);
+    font-size: 0.9375rem;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  /* From tablet up the band sticks, so the three actions stay one click away
+     at every scroll position (below 768px the fixed bottom bar does this job).
+     Solid chart background, no blur, no shadow: the 2px rule is the edge. */
+  @media (min-width: 768px) {
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .row {
+      min-height: 4.5rem;
+    }
+    .mark {
+      font-size: 1.125rem;
+    }
+  }
+</style>

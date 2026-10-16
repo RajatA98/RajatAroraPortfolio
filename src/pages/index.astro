@@ -1,0 +1,29 @@
+---
+// Home: one page, chapters in order. Hero (1) → Captain's Log (2) → The Voyage
+// (3, static base layer) → About (4) → Contact (5).
+// Section anchors are a contract: #log, #voyage, #about, #contact are targeted
+// by the 404 page, the action bars and future deep links.
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro';
+import CaptainsLog from '../components/log/CaptainsLog.astro';
+import VoyageTimeline from '../components/voyage/VoyageTimeline.astro';
+import About from '../components/About.astro';
+import Contact from '../components/Contact.astro';
+import type { LogEntryData } from '../data/case-study';
+import { stops } from '../data/stops';
+
+const entries: LogEntryData[] = (await getCollection('caseStudies', ({ data }) => !data.draft))
+  .sort((a, b) => a.data.order - b.data.order)
+  .map((e) => ({ id: e.id, study: e.data }));
+---
+<BaseLayout
+  title="Rajat Arora, AI Engineer"
+  description="Rajat Arora builds AI products that work in production. AI Engineer in Austin, TX, available now."
+>
+  <Hero />
+  <CaptainsLog entries={entries} />
+  <VoyageTimeline stops={stops} />
+  <About />
+  <Contact />
+</BaseLayout>

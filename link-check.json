@@ -1,0 +1,10 @@
+{
+  "default": [200],
+  "ignore": ["https://rajatarora.com"],
+  "overrides": {
+    "https://portfolio-agent-git-756982711593.us-central1.run.app": [200, 302, 303],
+    "https://apps.apple.com/": [200],
+    "https://github.com/": [200],
+    "https://www.linkedin.com/": [200, 999]
+  }
+}

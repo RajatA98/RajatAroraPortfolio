@@ -1,0 +1,44 @@
+# --- Never publish: Project Factory working artifacts (contain personal
+# --- contact details, reference photos, and franchise terms that must not
+# --- appear in visible source of the public repo). Back these up privately.
+factory/
+.claude/
+
+# Art references and generation prompts
+avatar-reference/
+**/avatar-reference/
+prompts/
+*.prompts.md
+*.prompt.txt
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+dist/
+dist-*/
+.astro/
+.vercel/
+
+# Test and tooling output
+test-results/
+playwright-report/
+blob-report/
+.lighthouseci/
+coverage/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/*
+!.vscode/extensions.json
+.vercel
+.env*
+
+# Written by the warn-only link-check workflow
+link-check-results.json

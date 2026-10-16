@@ -1,0 +1,48 @@
+{
+  "name": "rajatarora-portfolio",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "ip-scan": "node scripts/ip-scan.mjs",
+    "link-check": "node scripts/link-check.mjs",
+    "size": "size-limit",
+    "lhci": "lhci autorun",
+    "verify": "npm run check && npm run test && npm run build && npm run ip-scan && npm run size"
+  },
+  "dependencies": {
+    "@astrojs/react": "^7.1.0",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/archivo": "^5.3.0",
+    "@gsap/react": "^2.1.2",
+    "@vercel/speed-insights": "^2.0.0",
+    "astro": "^7.4.0",
+    "gsap": "^3.15.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "sharp": "^0.35.5"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.14.0",
+    "@lhci/cli": "^0.15.1",
+    "@playwright/test": "^1.64.1",
+    "@size-limit/file": "^14.2.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "size-limit": "^14.2.0",
+    "typescript": "^6.0.3",
+    "vitest": "^5.0.5",
+    "yaml": "^2.9.1"
+  }
+}

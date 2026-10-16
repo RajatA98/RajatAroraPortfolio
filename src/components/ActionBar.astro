@@ -1,0 +1,121 @@
+---
+// The three actions (Résumé, LinkedIn, GitHub) as plain ink text links.
+// Never collapsed behind a menu. `dock` is the fixed bottom bar shown below 768px.
+import { actions } from '../data/site';
+
+interface Props {
+  variant: 'header' | 'dock' | 'footer';
+}
+
+const { variant } = Astro.props;
+const labels = {
+  header: 'Résumé and profiles',
+  dock: 'Quick actions',
+  footer: 'Résumé and profiles, footer',
+} as const;
+---
+<nav class:list={['bar', `bar--${variant}`]} aria-label={labels[variant]} data-action-bar>
+  <ul role="list">
+    {
+      actions.map((a) => (
+        <li>
+          <a
+            href={a.href}
+            data-action={a.id}
+            download={a.download ? '' : undefined}
+            target={a.external ? '_blank' : undefined}
+            rel={a.external ? 'noopener' : undefined}
+          >
+            {a.label}
+            {a.external && <span class="visually-hidden"> (opens in a new tab)</span>}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</nav>
+
+<style>
+  ul {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--tap);
+    min-width: var(--tap);
+    padding-inline: var(--s-2);
+    color: var(--ink);
+    font-weight: 500;
+    font-size: var(--t-small);
+    text-decoration: none;
+    border-radius: var(--r);
+  }
+
+  a:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.3em;
+  }
+
+  .bar--header ul {
+    gap: var(--s-1);
+    margin-right: calc(var(--s-2) * -1);
+  }
+
+  @media (min-width: 768px) {
+    .bar--header ul {
+      gap: var(--s-3);
+    }
+    .bar--header a {
+      font-size: var(--t-0);
+    }
+  }
+
+  .bar--footer ul {
+    flex-wrap: wrap;
+    gap: var(--s-4);
+    margin-left: calc(var(--s-2) * -1);
+  }
+
+  .bar--footer a {
+    font-size: var(--t-0);
+  }
+
+  /* Fixed bottom bar: thumb reach on phones only. */
+  .bar--dock {
+    position: fixed;
+    inset: auto 0 0 0;
+    z-index: 10;
+    background: var(--chart);
+    border-top: var(--rule);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .bar--dock ul {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    height: var(--dock-h);
+  }
+
+  .bar--dock li + li {
+    border-left: var(--hairline);
+  }
+
+  .bar--dock a {
+    width: 100%;
+    height: 100%;
+    font-size: var(--t-0);
+  }
+
+  @media (min-width: 768px) {
+    .bar--dock {
+      display: none;
+    }
+  }
+</style>

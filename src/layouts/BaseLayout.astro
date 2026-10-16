@@ -1,0 +1,69 @@
+---
+// Shared page shell. CONTRACT (other pages depend on these props — keep them):
+//   title: string            — page <title>
+//   description?: string     — meta description
+//   noindex?: boolean        — adds <meta name="robots" content="noindex"> (lab routes)
+// Renders: skip link, ruled header with the three actions, <main id="main">,
+// footer, the fixed mobile action bar, and Vercel Speed Insights. No other JS.
+import '../styles/global.css';
+import displayFontUrl from '../styles/fonts/archivo-expanded-800.woff2?url';
+import SpeedInsights from '@vercel/speed-insights/astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import SiteFooter from '../components/SiteFooter.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  noindex?: boolean;
+}
+const { title, description = 'Rajat Arora, AI Engineer in Austin, TX.', noindex = false } = Astro.props;
+const site = Astro.site ?? new URL('https://rajatarora.com');
+const canonical = new URL(Astro.url.pathname, site).href;
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+    {!noindex && <link rel="canonical" href={canonical} />}
+    <link rel="preload" href={displayFontUrl} as="font" type="font/woff2" crossorigin />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#F4F6F3" />
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <SiteHeader />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <SiteFooter />
+    <SpeedInsights />
+  </body>
+</html>
+
+<style>
+  .skip-link {
+    position: absolute;
+    top: var(--s-2);
+    left: var(--s-2);
+    z-index: 20;
+    padding: var(--s-3) var(--s-4);
+    background: var(--sun);
+    color: var(--ink);
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: var(--r);
+    transform: translateY(-200%);
+  }
+
+  .skip-link:focus {
+    transform: none;
+  }
+
+  main:focus {
+    outline: none;
+  }
+</style>

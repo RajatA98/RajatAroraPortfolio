@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1180 780" font-family="'Segoe UI', Helvetica, Arial, sans-serif" role="img" aria-label="Dual-core 5-stage pipelined MIPS processor architecture diagram">
+  <title>Dual-core 5-stage pipelined MIPS processor</title>
+
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#64748b"/>
+    </marker>
+    <style>
+      .stage   { fill:#64748b; font-size:19px; font-weight:700; letter-spacing:1px; }
+      .reg     { fill:#334155; }
+      .regtxt  { fill:#e2e8f0; font-size:11px; font-weight:600; }
+      .blk     { stroke:#0f172a; stroke-width:1.2; rx:9; }
+      .blktxt  { fill:#0f172a; font-size:13.5px; font-weight:700; text-anchor:middle; }
+      .blksub  { fill:#1e293b; font-size:10.5px; font-weight:500; text-anchor:middle; }
+      .ctrl    { stroke:#9a3412; stroke-width:1.3; }
+      .ctrltxt { fill:#7c2d12; font-size:12.5px; font-weight:700; text-anchor:middle; }
+      .flow    { stroke:#64748b; stroke-width:1.6; fill:none; }
+      .cap     { fill:#64748b; font-size:12px; }
+      .title   { fill:#64748b; font-size:13px; font-weight:600; }
+    </style>
+  </defs>
+
+  <!-- stage headers -->
+  <text class="stage" x="130" y="40" text-anchor="middle">IF</text>
+  <text class="stage" x="360" y="40" text-anchor="middle">ID</text>
+  <text class="stage" x="610" y="40" text-anchor="middle">EX</text>
+  <text class="stage" x="850" y="40" text-anchor="middle">MEM</text>
+  <text class="stage" x="1070" y="40" text-anchor="middle">WB</text>
+
+  <!-- pipeline registers -->
+  <g>
+    <rect class="reg" x="238" y="58" width="22" height="470" rx="4"/>
+    <text class="regtxt" transform="rotate(-90 249 293)" x="249" y="293" text-anchor="middle">IF / ID</text>
+    <rect class="reg" x="480" y="58" width="22" height="470" rx="4"/>
+    <text class="regtxt" transform="rotate(-90 491 293)" x="491" y="293" text-anchor="middle">ID / EX</text>
+    <rect class="reg" x="722" y="58" width="22" height="470" rx="4"/>
+    <text class="regtxt" transform="rotate(-90 733 293)" x="733" y="293" text-anchor="middle">EX / MEM</text>
+    <rect class="reg" x="962" y="58" width="22" height="470" rx="4"/>
+    <text class="regtxt" transform="rotate(-90 973 293)" x="973" y="293" text-anchor="middle">MEM / WB</text>
+  </g>
+
+  <!-- ===== IF ===== -->
+  <rect class="blk" x="40" y="120" width="120" height="56" fill="#bfdbfe"/>
+  <text class="blktxt" x="100" y="144">PC</text>
+  <text class="blksub" x="100" y="161">program counter</text>
+
+  <rect class="blk" x="40" y="220" width="120" height="70" fill="#bfdbfe"/>
+  <text class="blktxt" x="100" y="248">I-Cache</text>
+  <text class="blksub" x="100" y="265">16-frame</text>
+  <text class="blksub" x="100" y="279">direct-mapped</text>
+
+  <path class="flow" d="M100 176 L100 220" marker-end="url(#arrow)"/>
+  <path class="flow" d="M160 255 L238 255" marker-end="url(#arrow)"/>
+
+  <!-- ===== ID ===== -->
+  <rect class="blk" x="280" y="110" width="180" height="70" fill="#bbf7d0"/>
+  <text class="blktxt" x="370" y="138">Control Unit</text>
+  <text class="blksub" x="370" y="155">decode + control</text>
+  <text class="blksub" x="370" y="169">signal generation</text>
+
+  <rect class="blk" x="280" y="210" width="180" height="78" fill="#bbf7d0"/>
+  <text class="blktxt" x="370" y="238">Register File</text>
+  <text class="blksub" x="370" y="255">32 x 32-bit</text>
+  <text class="blksub" x="370" y="269">2 read / 1 write</text>
+
+  <rect class="blk" x="280" y="320" width="180" height="56" fill="#bbf7d0"/>
+  <text class="blktxt" x="370" y="344">Sign-Extend</text>
+  <text class="blksub" x="370" y="361">immediate</text>
+
+  <path class="flow" d="M260 160 L280 150" marker-end="url(#arrow)"/>
+  <path class="flow" d="M260 250 L280 248" marker-end="url(#arrow)"/>
+  <path class="flow" d="M460 250 L480 250" marker-end="url(#arrow)"/>
+  <path class="flow" d="M460 345 L480 320" marker-end="url(#arrow)"/>
+
+  <!-- ===== EX ===== -->
+  <rect class="blk" x="520" y="210" width="180" height="86" fill="#fde68a"/>
+  <text class="blktxt" x="610" y="240">ALU</text>
+  <text class="blksub" x="610" y="257">arithmetic / logic</text>
+  <text class="blksub" x="610" y="271">branch compare</text>
+  <text class="blksub" x="610" y="285">(zero flag)</text>
+
+  <path class="flow" d="M502 252 L520 252" marker-end="url(#arrow)"/>
+  <path class="flow" d="M700 252 L722 252" marker-end="url(#arrow)"/>
+
+  <!-- ===== MEM ===== -->
+  <rect class="blk" x="760" y="210" width="180" height="86" fill="#fecaca"/>
+  <text class="blktxt" x="850" y="240">D-Cache</text>
+  <text class="blksub" x="850" y="257">2-way set-assoc.</text>
+  <text class="blksub" x="850" y="271">write-back + dirty</text>
+  <text class="blksub" x="850" y="285">LL / SC support</text>
+
+  <path class="flow" d="M744 252 L760 252" marker-end="url(#arrow)"/>
+  <path class="flow" d="M940 252 L962 252" marker-end="url(#arrow)"/>
+
+  <!-- ===== WB ===== -->
+  <rect class="blk" x="1010" y="210" width="140" height="70" fill="#ddd6fe"/>
+  <text class="blktxt" x="1080" y="240">Write-Back</text>
+  <text class="blksub" x="1080" y="257">ALU / mem</text>
+  <text class="blksub" x="1080" y="271">result mux</text>
+
+  <path class="flow" d="M984 245 L1010 245" marker-end="url(#arrow)"/>
+
+  <!-- write-back path to register file -->
+  <path class="flow" d="M1080 280 L1080 560 L370 560 L370 288" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text class="cap" x="640" y="553">write-back result &#8594; register file</text>
+
+  <!-- ===== Branch Predictor (feeds PC) ===== -->
+  <rect class="blk ctrl" x="520" y="110" width="180" height="60" fill="#fed7aa"/>
+  <text class="ctrltxt" x="610" y="135">Branch Predictor</text>
+  <text class="blksub" x="610" y="152">static not-taken +</text>
+  <text class="blksub" x="610" y="165">flush on mispredict</text>
+  <path class="flow" d="M610 170 L610 200" marker-end="url(#arrow)"/>
+  <path class="flow" d="M520 130 L100 130 L100 118" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text class="cap" x="250" y="104">redirect PC</text>
+
+  <!-- ===== Hazard Unit ===== -->
+  <rect class="blk ctrl" x="280" y="610" width="230" height="64" fill="#fdba74"/>
+  <text class="ctrltxt" x="395" y="636">Hazard Unit</text>
+  <text class="blksub" x="395" y="653">load-use stalls,</text>
+  <text class="blksub" x="395" y="666">branch / jump flushes</text>
+  <path class="flow" d="M395 610 L395 376" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <path class="flow" d="M280 642 L80 642 L80 176" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <text class="cap" x="110" y="196">stall / PC enable</text>
+
+  <!-- ===== Forwarding Unit ===== -->
+  <rect class="blk ctrl" x="600" y="610" width="230" height="64" fill="#fdba74"/>
+  <text class="ctrltxt" x="715" y="636">Forwarding Unit</text>
+  <text class="blksub" x="715" y="653">EX/MEM &amp; MEM/WB</text>
+  <text class="blksub" x="715" y="666">operand bypass</text>
+  <path class="flow" d="M640 610 L610 296" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+  <path class="flow" d="M830 642 L855 642 L855 296" stroke-dasharray="5 4" marker-end="url(#arrow)"/>
+
+  <!-- divider -->
+  <line x1="40" y1="706" x2="1150" y2="706" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3 4"/>
+  <text class="title" x="40" y="726">Multicore + cache coherence</text>
+
+  <!-- ===== Multicore bottom strip ===== -->
+  <rect class="blk" x="40" y="734" width="150" height="34" fill="#a5b4fc"/>
+  <text class="blktxt" x="115" y="755">Core 0 (datapath)</text>
+
+  <rect class="blk" x="210" y="734" width="150" height="34" fill="#a5b4fc"/>
+  <text class="blktxt" x="285" y="755">Core 1 (datapath)</text>
+
+  <rect class="blk ctrl" x="470" y="734" width="260" height="34" fill="#fca5a5"/>
+  <text class="ctrltxt" x="600" y="755">Snooping Bus / Coherence Ctrl (MSI)</text>
+
+  <rect class="blk" x="820" y="734" width="130" height="34" fill="#cbd5e1"/>
+  <text class="blktxt" x="885" y="755">Shared RAM</text>
+
+  <path class="flow" d="M190 751 L210 751" marker-end="url(#arrow)"/>
+  <path class="flow" d="M360 751 L470 751" marker-end="url(#arrow)"/>
+  <path class="flow" d="M730 751 L820 751" marker-end="url(#arrow)"/>
+</svg>

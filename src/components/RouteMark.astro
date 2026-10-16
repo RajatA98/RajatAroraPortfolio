@@ -1,0 +1,40 @@
+---
+// The signature mark: a dashed route rising left to right, ending in an open
+// circle (the next island) with a small sun disc above it. 2px ink stroke.
+// Decorative by default; pass `title` to make it an image with a name.
+interface Props {
+  class?: string;
+  title?: string;
+}
+const { class: className, title } = Astro.props;
+---
+<svg
+  class:list={['route-mark', className]}
+  viewBox="0 0 240 72"
+  width="240"
+  height="72"
+  fill="none"
+  role={title ? 'img' : undefined}
+  aria-hidden={title ? undefined : 'true'}
+  aria-label={title}
+  focusable="false"
+>
+  <path
+    d="M2 66 C 46 66, 62 46, 104 46 S 168 30, 205 33"
+    stroke="var(--ink, #0E1B2B)"
+    stroke-width="2"
+    stroke-linecap="round"
+    stroke-dasharray="7 6"
+  ></path>
+  <circle cx="220" cy="34" r="12" stroke="var(--ink, #0E1B2B)" stroke-width="2"></circle>
+  <circle cx="220" cy="9" r="6" fill="var(--sun, #F2A93B)"></circle>
+</svg>
+
+<style>
+  .route-mark {
+    width: 100%;
+    max-width: 15rem;
+    height: auto;
+    overflow: visible;
+  }
+</style>

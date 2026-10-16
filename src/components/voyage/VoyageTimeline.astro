@@ -1,0 +1,244 @@
+---
+// Chapter 3: The Voyage, the static base layer. Anchor: #voyage.
+// This is the reduced-motion, JS-off and crawler version of the voyage AND the
+// whole mobile experience: an ordered list of the real stops, each with place,
+// chapter, role, dates and a labelled ship-size badge, with the two milestones
+// marked where the ship changes size. Above the list on wide screens, the route
+// is drawn once as a still chart (a decorative motif, never a pannable map).
+//
+// CONTRACT with Build-Phase 5: the desktop island server-renders THIS markup
+// (ol[data-voyage-list] > li[data-stop-id]#stop-<id], a[data-stop-place],
+// img[data-ship-badge]) and enhances it in place by setting attributes. The
+// semantic nodes are never replaced. No GSAP mounts below 1024px, ever.
+import LogbookSection from '../LogbookSection.astro';
+import type { Stop } from '../../data/stops';
+import { shipSprite } from '../../data/ship-size';
+import { formatDates } from './format-dates';
+import { buildRoute, type Point } from './route';
+
+interface Props {
+  stops: readonly Stop[];
+}
+const { stops } = Astro.props;
+
+const milestoneLabel = { graduation: 'Graduation', 'turning-point': 'The turning point' } as const;
+
+// The still chart: only stops with coordinates are drawn, and only when there
+// are at least two of them to draw a route between.
+const charted = stops.filter((s): s is Stop & { map: Point } => s.map !== null);
+const route = charted.length >= 2 ? buildRoute(charted.map((s) => s.map)) : null;
+const last = charted.at(-1);
+---
+<LogbookSection id="voyage" chapter="3" title="The Voyage">
+  <p class="lede">
+    Every port on this chart is a real chapter. The ship grows at two milestones: when I
+    graduated, and at the turning point when I moved into AI engineering full time.
+  </p>
+
+  {
+    route && (
+      <svg
+        class="chart"
+        data-voyage-chart
+        viewBox="0 0 1000 600"
+        preserveAspectRatio="xMidYMid meet"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path class="chart-route" d={route.d} />
+        {charted.map((s) =>
+          s === last ? (
+            <g class="chart-island">
+              <circle cx={s.map.x} cy={s.map.y} r="14" />
+              <circle class="chart-sun" cx={s.map.x} cy={s.map.y - 30} r="7" />
+            </g>
+          ) : (
+            <circle class="chart-port" cx={s.map.x} cy={s.map.y} r={s.sizeSwap ? 9 : 6} />
+          ),
+        )}
+      </svg>
+    )
+  }
+
+  <ol class="stops" data-voyage-list>
+    {
+      stops.map((stop) => (
+        <li
+          id={`stop-${stop.id}`}
+          class="stop"
+          data-stop-id={stop.id}
+          data-milestone={stop.sizeSwap && stop.milestone ? stop.milestone : undefined}
+        >
+          <span class="badge">
+            <img
+              src={shipSprite[stop.shipSize]}
+              alt={`${stop.shipSize} ship`}
+              width="48"
+              height="24"
+              loading="lazy"
+              decoding="async"
+              data-ship-badge
+            />
+          </span>
+          <div class="text">
+            {stop.sizeSwap && stop.milestone && <p class="milestone">{milestoneLabel[stop.milestone]}</p>}
+            <h3 class="place">
+              <a href={`#stop-${stop.id}`} data-stop-place>
+                {stop.place}
+              </a>
+            </h3>
+            <p class="chapter-name">{stop.chapter}</p>
+            <p class="role">{stop.role}</p>
+            <p class="dates">{formatDates(stop.dates)}</p>
+          </div>
+        </li>
+      ))
+    }
+  </ol>
+</LogbookSection>
+
+<style>
+  .lede {
+    max-width: var(--measure);
+  }
+
+  /* The still chart. Hidden on phones, where the cards are the whole voyage
+     and the map would only push the proof further down. */
+  .chart {
+    display: none;
+  }
+
+  .stops {
+    width: 100%;
+    max-width: var(--measure);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-left: var(--rule);
+  }
+
+  .stop {
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    gap: var(--s-4);
+    align-items: start;
+    padding: var(--s-4) 0 var(--s-4) var(--s-4);
+    border-bottom: var(--hairline);
+    scroll-margin-top: calc(var(--header-h) + var(--s-4));
+  }
+
+  .stop:last-child {
+    border-bottom: 0;
+  }
+
+  /* A port stamp: the ship at its current size inside an inked ring. */
+  .badge {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--ink);
+    border-radius: 50%;
+    background: var(--chart);
+  }
+
+  .badge img {
+    width: 48px;
+    height: 24px;
+  }
+
+  .text {
+    min-width: 0;
+    display: grid;
+    gap: var(--s-1);
+  }
+
+  /* Milestone: sun is a fill only, ink text on top (never sun text). */
+  .milestone {
+    justify-self: start;
+    padding: var(--s-1) var(--s-2);
+    border-radius: var(--r);
+    background: var(--sun);
+    color: var(--ink);
+    font-size: var(--t-small);
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .place {
+    font-size: var(--t-1);
+    overflow-wrap: anywhere;
+  }
+
+  .place a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .place a:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--sea);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  .chapter-name,
+  .role,
+  .dates {
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+  }
+
+  .chapter-name {
+    font-weight: 500;
+  }
+
+  .role,
+  .dates {
+    color: var(--ink-60);
+  }
+
+  @media (min-width: 768px) {
+    .chart {
+      display: block;
+      width: 100%;
+      max-width: 40rem;
+      height: auto;
+      aspect-ratio: 5 / 3;
+      border: var(--rule);
+      border-radius: var(--r);
+      background: var(--chart) url('/voyage/chart-grid.svg') repeat;
+      background-size: 48px 48px;
+    }
+
+    .chart-route {
+      fill: none;
+      stroke: var(--sea);
+      stroke-width: 2;
+      stroke-dasharray: 10 8;
+      stroke-linecap: round;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .chart-port {
+      fill: var(--chart);
+      stroke: var(--ink);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .chart-island circle {
+      fill: none;
+      stroke: var(--ink);
+      stroke-width: 2;
+      vector-effect: non-scaling-stroke;
+    }
+
+    .chart-island .chart-sun {
+      fill: var(--sun);
+    }
+  }
+</style>

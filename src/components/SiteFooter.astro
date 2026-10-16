@@ -1,0 +1,48 @@
+---
+// Footer: the three actions again, where a reader who scrolled to the end looks,
+// plus the name, location and a link back to the Contact chapter. The CTA line
+// lives in Contact (directly above), so the footer does not repeat it. The
+// fixed mobile action bar is rendered here too.
+import ActionBar from './ActionBar.astro';
+import { location, name } from '../data/site';
+---
+<footer class="site-footer">
+  <div class="wrap inner">
+    <ActionBar variant="footer" />
+    <p class="meta">
+      <span>{name}, {location}</span>
+      <a href="/#contact">Contact</a>
+    </p>
+  </div>
+</footer>
+<ActionBar variant="dock" />
+
+<style>
+  .site-footer {
+    border-top: var(--rule);
+    margin-top: var(--s-9);
+  }
+
+  .inner {
+    display: grid;
+    gap: var(--s-4);
+    padding-block: var(--s-7) var(--s-6);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0 var(--s-5);
+    color: var(--ink-60);
+    font-size: var(--t-small);
+  }
+
+  .meta a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    min-width: var(--tap);
+    font-weight: 500;
+  }
+</style>

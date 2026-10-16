@@ -1,0 +1,11 @@
+{
+  "bodyPhrase": "Grand Line",
+  "bodyFile": "src/about.md",
+  "bodyLine": 3,
+  "filenameWord": "zoro",
+  "emoji": "🏴‍☠️",
+  "emojiNoSelector": "🏴‍☠",
+  "mixedCase": "sHuEiShA",
+  "wholeWord": "Oda",
+  "wholeWordNearMisses": ["today", "Odd", "coda", "Odaiba", "merrymaking", "Sunnyvale", "tiptoeing"]
+}

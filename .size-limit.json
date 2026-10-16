@@ -1,0 +1,14 @@
+[
+  {
+    "name": "All client JS (Astro runtime + React + GSAP + Voyage island)",
+    "path": "dist/_astro/*.js",
+    "limit": "150 kB",
+    "gzip": true
+  },
+  {
+    "name": "GSAP chunk",
+    "path": "dist/_astro/gsap*.js",
+    "limit": "60 kB",
+    "gzip": true
+  }
+]

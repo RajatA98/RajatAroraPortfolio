@@ -1,0 +1,22 @@
+# IP denylist: franchise terms that must never appear in readable or crawlable
+# output, source, filenames, or image metadata. Read by scripts/ip-scan.mjs.
+#
+# Format: one term per line, matched case-insensitively.
+#   term          substring match (spaces also match "-", "_" or nothing)
+#   term|word     whole-word match (no letter, digit or underscore on either side)
+# Lines starting with # are comments. This file is the ONLY place in the repo
+# (besides tests/fixtures/ip-scan/) where these terms may appear.
+
+One Piece
+Oda|word
+Shueisha
+Toei|word
+Merry|word
+Sunny|word
+Luffy
+Zoro
+Grand Line
+jolly roger
+straw hat
+devil fruit
+🏴‍☠️

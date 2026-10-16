@@ -1,0 +1,66 @@
+name: Link check
+
+# Warn-only. A broken or flaky third-party link never fails this workflow and
+# never blocks ci.yml, so an outage elsewhere cannot hold up a resume fix.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: '17 9 * * 1' # Mondays 09:17 UTC
+  workflow_dispatch:
+
+concurrency:
+  group: link-check-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  links:
+    name: External links and local files (warn-only)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Link check
+        id: links
+        continue-on-error: true
+        run: npm run --silent link-check -- --json > link-check-results.json
+
+      - name: Report
+        if: always()
+        run: |
+          node --input-type=module -e "
+            import { readFileSync, appendFileSync } from 'node:fs';
+            import { formatReport } from './scripts/link-check-lib.mjs';
+            let data;
+            try { data = JSON.parse(readFileSync('link-check-results.json', 'utf8')); }
+            catch { console.log('::warning title=Link check::no results; see the Link check step log'); process.exit(0); }
+            const table = formatReport(data.results, { missingAssets: data.missingAssets });
+            console.log(table);
+            if (process.env.GITHUB_STEP_SUMMARY) appendFileSync(process.env.GITHUB_STEP_SUMMARY, '## Link check (warn-only)\n\n\`\`\`\n' + table + '\n\`\`\`\n');
+            if (!data.ok) console.log('::warning title=Link check::' + table.split('\n').at(-1));
+          "
+
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: link-check-results
+          path: link-check-results.json
+          retention-days: 30
+          if-no-files-found: ignore

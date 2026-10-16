@@ -1,0 +1,63 @@
+---
+// Chapter 2: the Captain's Log. CONTRACT (index.astro depends on it): props
+// `entries` = the non-draft case studies, already sorted by order.
+// A short table of contents (same-page links to #log-<id>), then every entry
+// fully expanded: rows separated by 2px ink rules, no cards, no JS.
+import LogbookSection from '../LogbookSection.astro';
+import LogEntry from './LogEntry.astro';
+import type { LogEntryData } from '../../data/case-study';
+
+interface Props {
+  entries: readonly LogEntryData[];
+}
+const { entries } = Astro.props;
+---
+<LogbookSection id="log" chapter="2" title="Captain's Log">
+  <nav class="toc" aria-label="Log entries">
+    <ol>
+      {entries.map((e) => (
+        <li>
+          <a href={`#log-${e.id}`}>{e.study.title}</a>
+        </li>
+      ))}
+    </ol>
+  </nav>
+  <ol class="entries" role="list">
+    {entries.map((e) => (
+      <li>
+        <LogEntry id={e.id} study={e.study} />
+      </li>
+    ))}
+  </ol>
+</LogbookSection>
+
+<style>
+  .toc,
+  .entries {
+    width: 100%;
+    max-width: var(--measure);
+  }
+
+  .toc ol {
+    padding-left: 2.25em;
+  }
+
+  .toc li::marker {
+    color: var(--ink-60);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .toc a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-weight: 500;
+  }
+
+  .entries {
+    display: grid;
+    padding: 0;
+    list-style: none;
+    border-bottom: var(--rule);
+  }
+</style>

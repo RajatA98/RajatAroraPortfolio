@@ -1,0 +1,72 @@
+---
+// A chapter of the log book: the section anchor every action and 404 link
+// targets, the chapter number hanging in the ruled margin on desktop, and the
+// section title. The hero keeps its own layout; every later chapter uses this.
+// CONTRACT: `id` is the anchor (#log, #about, #contact); the heading id is
+// `${id}-title` and labels the section.
+interface Props {
+  id: string;
+  chapter: string;
+  title: string;
+  class?: string;
+}
+const { id, chapter, title, class: className } = Astro.props;
+---
+<section id={id} class:list={['chapter-section', className]} aria-labelledby={`${id}-title`}>
+  <div class="wrap logbook">
+    <span class="chapter" aria-hidden="true">{chapter}</span>
+    <div class="page">
+      <h2 id={`${id}-title`}>{title}</h2>
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  .chapter-section {
+    padding-block: var(--s-9) 0;
+    scroll-margin-top: calc(var(--header-h) + var(--s-4));
+  }
+
+  .chapter {
+    display: none;
+  }
+
+  .page {
+    display: grid;
+    gap: var(--s-6);
+    justify-items: start;
+  }
+
+  h2 {
+    font-size: var(--t-4);
+  }
+
+  @media (min-width: 1024px) {
+    .chapter-section {
+      padding-block: var(--s-10) 0;
+    }
+
+    .logbook {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr;
+    }
+
+    .chapter {
+      display: block;
+      padding-top: var(--s-1);
+      padding-right: var(--s-5);
+      text-align: right;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--t-3);
+      line-height: 1;
+    }
+
+    .page {
+      border-left: var(--rule);
+      padding-left: var(--s-8);
+      padding-bottom: var(--s-4);
+    }
+  }
+</style>

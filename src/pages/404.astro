@@ -1,0 +1,51 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RouteMark from '../components/RouteMark.astro';
+---
+<BaseLayout title="Page not found, Rajat Arora" description="This page is not on the chart." noindex>
+  <section class="wrap lost" aria-labelledby="lost-title">
+    <RouteMark class="lost-mark" />
+    <h1 id="lost-title">Off the chart</h1>
+    <p>There is no page at this address. The route picks up again from the start, or from the log.</p>
+    <ul class="ways" role="list">
+      <li><a href="/">Back to the start</a></li>
+      <li><a href="/#log">Read the log</a></li>
+    </ul>
+  </section>
+</BaseLayout>
+
+<style>
+  .lost {
+    display: grid;
+    gap: var(--s-5);
+    justify-items: start;
+    padding-block: var(--s-8) 0;
+  }
+
+  .lost :global(.lost-mark) {
+    max-width: 10rem;
+  }
+
+  h1 {
+    font-size: var(--t-4);
+  }
+
+  p {
+    max-width: 44ch;
+  }
+
+  .ways {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-2) var(--s-5);
+    padding: 0;
+    list-style: none;
+  }
+
+  .ways a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    font-weight: 500;
+  }
+</style>

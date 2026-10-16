@@ -1,0 +1,52 @@
+---
+// Phase 1 engine spike: kept in-repo, noindex. The island is server-rendered
+// from the stop data (so the same list serves JS-off and reduced motion) and
+// hydrates when it comes within 600px of the viewport. `data-testhook` lets
+// the e2e suite read window.__voyage from the preview build.
+// The prose below the island is deliberate: it exposes any mount-time shift.
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import VoyageSpike from '@/components/voyage/VoyageSpike';
+import { stops } from '@/data/stops';
+
+const filler = [
+  'This page is a lab bench, not a destination. It holds the Voyage engine spike so its performance and accessibility can be measured in a realistic setting: a server-rendered list of stops, a desktop-only animation layered over it, and ordinary content after it.',
+  'Everything you read in the list above is plain HTML. With reduced motion requested, with scripting off, or on a narrow screen, that list is the whole experience, and it is complete: every place, chapter, role, date and ship size is there as text.',
+  'On a wide screen with motion allowed, the same list becomes a side panel and a chart appears beside it. Scrolling pins the chart and moves the ship along the route. The ship is an HTML element above the drawing, so moving it is a transform the compositor can handle on its own.',
+  'The section height is reserved in the stylesheet before any script runs. When the animation mounts, nothing below it moves. This paragraph and the ones after it are here to make that claim testable: a layout-shift observer would catch them if they jumped.',
+  'Pausing the voyage removes every scroll trigger and every inline style the animation added, and the list goes back to its ordinary layout. Playing it again rebuilds the animation from scratch.',
+  'Measurements for this spike come from a throttled performance trace: a full scroll through the pinned section at four times CPU slowdown, summarized into a median frame rate, a 95th percentile frame time, and a count of slow frames.',
+  'If the spike cannot hold its frame budget, the plan already allows shipping the static list on its own. The list is not a fallback in the sense of a lesser version; it is the base the animation is built on.',
+  'Below this point there is nothing else to see. The extra length is only here so that the page can scroll past the pinned section and the end of the pin can be observed as well as its start.',
+];
+---
+<BaseLayout title="Voyage spike" noindex={true}>
+  <main class="spike">
+    <header class="spike__intro">
+      <h1>Voyage spike</h1>
+      <p>Scroll down to sail the route. Use the pause button to turn the motion off.</p>
+    </header>
+
+    <VoyageSpike client:visible={{ rootMargin: '600px' }} stops={stops} data-testhook />
+
+    <article class="spike__prose">
+      <h2>About this page</h2>
+      {filler.map((p) => <p>{p}</p>)}
+      {filler.map((p) => <p>{p}</p>)}
+    </article>
+  </main>
+</BaseLayout>
+
+<style>
+  .spike__intro,
+  .spike__prose {
+    max-width: 64ch;
+    margin: 0 auto;
+    padding: 48px 16px;
+  }
+  .spike__intro {
+    min-height: 60vh;
+  }
+  .spike__prose p {
+    line-height: 1.55;
+  }
+</style>

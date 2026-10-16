@@ -1,0 +1,87 @@
+---
+// A progressive copy button. Ships `hidden`; the tiny script below reveals it,
+// so without JavaScript the selectable value and its link are the whole
+// experience. On success it says "Copied" for about 2 s; on failure it selects
+// the value text (`target` is the id of the element that shows it) and asks
+// the reader to copy it by hand. Feedback goes to the nearest
+// `[data-copy-status]` live region (Contact renders one).
+interface Props {
+  value: string;
+  label: string;
+  /** id of the element whose text is selected when the clipboard is unavailable. */
+  target: string;
+}
+const { value, label, target } = Astro.props;
+---
+<button type="button" class="copy" data-copy={value} data-copy-target={target} aria-label={label} hidden>
+  Copy
+</button>
+
+<script>
+  const STATUS = '[data-copy-status]';
+  for (const b of document.querySelectorAll<HTMLButtonElement>('button[data-copy]')) {
+    const idle = b.textContent?.trim() || 'Copy';
+    const status = b.closest('section')?.querySelector(STATUS) ?? document.querySelector(STATUS);
+    const say = (m: string) => {
+      if (status) status.textContent = m;
+    };
+    let timer: number | undefined;
+    b.hidden = false;
+    b.addEventListener('click', async () => {
+      window.clearTimeout(timer);
+      try {
+        await navigator.clipboard.writeText(b.dataset.copy ?? '');
+        b.textContent = 'Copied';
+        say('Copied');
+        timer = window.setTimeout(() => {
+          b.textContent = idle;
+          say('');
+        }, 2000);
+      } catch {
+        const el = document.getElementById(b.dataset.copyTarget ?? '');
+        const sel = window.getSelection();
+        if (el && sel) {
+          const range = document.createRange();
+          range.selectNodeContents(el);
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+        say('Select and copy the text');
+      }
+    });
+  }
+</script>
+
+<style>
+  .copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: var(--tap);
+    min-width: var(--tap);
+    padding-inline: var(--s-4);
+    font: inherit;
+    font-size: var(--t-small);
+    font-weight: 500;
+    color: var(--ink);
+    background: transparent;
+    border: var(--rule);
+    border-radius: var(--r);
+    cursor: pointer;
+    transition:
+      background-color var(--dur) var(--ease),
+      transform var(--dur) var(--ease);
+  }
+
+  .copy[hidden] {
+    display: none;
+  }
+
+  .copy:hover {
+    background: var(--sun);
+  }
+
+  .copy:active {
+    transform: translateY(1px);
+  }
+</style>

@@ -1,0 +1,179 @@
+---
+// Chapter 1: the thin hero. Avatar slot (placeholder until the avatar track
+// lands) with explicit dimensions, the value line, the status line, the
+// current role as supporting evidence, the route mark, the tagline and the
+// quiet skills strip. The three actions live in the header directly above.
+import RouteMark from './RouteMark.astro';
+import { currentRole, name, skills, statusLine, tagline, valueLine } from '../data/site';
+---
+<section class="hero" aria-labelledby="hero-name">
+  <div class="wrap logbook">
+    <span class="chapter" aria-hidden="true">1</span>
+    <div class="page">
+      <img
+        class="avatar"
+        src="/avatar-placeholder.svg"
+        width="240"
+        height="240"
+        alt="Rajat Arora"
+        fetchpriority="high"
+        decoding="async"
+      />
+      <div class="lede">
+        <h1 id="hero-name">{name}</h1>
+        <p class="value">{valueLine}</p>
+        <p class="status">{statusLine}</p>
+        <p class="role">{currentRole}</p>
+      </div>
+      <RouteMark class="hero-mark" />
+      <div class="aside">
+        <p class="tagline">{tagline}</p>
+        <ul class="skills" role="list" aria-label="Skills">
+          {skills.map((s) => <li>{s}</li>)}
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    padding-block: var(--s-7) 0;
+  }
+
+  .chapter {
+    display: none;
+  }
+
+  .page {
+    display: grid;
+    gap: var(--s-6);
+    justify-items: start;
+  }
+
+  /* Fixed box plus a fog fill: if the image fails, the alt text sits inside a
+     stable 160/240px placeholder and nothing below it moves. */
+  .avatar {
+    width: 160px;
+    height: 160px;
+    border-radius: 50%;
+    background: var(--fog);
+    overflow: hidden;
+    color: var(--ink);
+    font-size: var(--t-small);
+  }
+
+  .lede {
+    display: grid;
+    gap: var(--s-4);
+  }
+
+  h1 {
+    font-size: var(--t-5);
+  }
+
+  .value {
+    max-width: 24ch;
+    text-wrap: balance;
+    font-size: var(--t-2);
+    font-weight: 500;
+    line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+
+  .status {
+    max-width: 44ch;
+  }
+
+  .role {
+    max-width: 44ch;
+    color: var(--ink-60);
+    font-size: var(--t-small);
+  }
+
+  .page :global(.hero-mark) {
+    max-width: 9rem;
+  }
+
+  .aside {
+    display: grid;
+    gap: var(--s-3);
+    padding-top: var(--s-4);
+    border-top: var(--hairline);
+    max-width: var(--measure);
+  }
+
+  .tagline,
+  .skills {
+    color: var(--ink-60);
+    font-size: var(--t-small);
+  }
+
+  .skills {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 0;
+    list-style: none;
+  }
+
+  .skills li:not(:last-child)::after {
+    content: ',\00a0';
+  }
+
+  /* Desktop: the ruled log-book margin with the chapter number in the gutter. */
+  @media (min-width: 1024px) {
+    .hero {
+      padding-block: var(--s-8) 0;
+    }
+
+    .logbook {
+      display: grid;
+      grid-template-columns: 4.5rem 1fr;
+    }
+
+    .chapter {
+      display: block;
+      padding-top: var(--s-1);
+      padding-right: var(--s-5);
+      text-align: right;
+      font-family: var(--font-display);
+      font-weight: 800;
+      font-size: var(--t-3);
+      line-height: 1;
+    }
+
+    .page {
+      border-left: var(--rule);
+      padding-left: var(--s-8);
+      padding-bottom: var(--s-4);
+      grid-template-columns: 240px 1fr;
+      column-gap: var(--s-7);
+      row-gap: var(--s-6);
+      align-items: start;
+    }
+
+    .avatar {
+      width: 240px;
+      height: 240px;
+      grid-row: span 2;
+    }
+
+    .lede {
+      gap: var(--s-5);
+    }
+
+    .value {
+      font-size: var(--t-3);
+      line-height: 1.12;
+    }
+
+    .page :global(.hero-mark) {
+      grid-column: 2;
+      max-width: 15rem;
+    }
+
+    .aside {
+      grid-column: 1 / -1;
+    }
+  }
+</style>

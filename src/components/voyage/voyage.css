@@ -1,0 +1,360 @@
+/* Voyage island. Two modes:
+   - Base (mobile, reduced motion, JS off, or paused): a vertical list of stop
+     cards. Complete on its own.
+   - Motion (desktop + motion allowed + scripting on + not paused): the same
+     list as a compact side panel next to a chart, inside a pinned stage. The
+     section height is RESERVED HERE (500vh) and the stage is pinned with
+     position: sticky, so the document height never changes and neither the
+     mount nor the pin produces layout shift.
+   Anything that animates uses transform or opacity only. */
+
+.voyage {
+  --v-ink: var(--ink, #0e1b2b);
+  --v-chart: var(--chart, #f4f6f3);
+  --v-sea: var(--sea, #1b6f8a);
+  --v-sun: var(--sun, #f2a93b);
+  --v-signal: var(--signal, #c7302b);
+  --v-fog: var(--fog, #d5dbd7);
+  --v-ink-60: rgb(14 27 43 / 0.6);
+  --v-ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  color: var(--v-ink);
+  background: var(--v-chart);
+  border-top: 2px solid var(--v-ink);
+  border-bottom: 2px solid var(--v-ink);
+}
+
+.voyage__section {
+  position: relative;
+}
+
+.voyage__stage {
+  position: relative;
+}
+
+.voyage__visual {
+  display: none;
+}
+
+.voyage__panel {
+  padding: 48px 16px;
+  max-width: 68rem;
+  margin: 0 auto;
+}
+
+.voyage__title {
+  margin: 0 0 24px;
+  font-size: clamp(1.95rem, 1.4rem + 2vw, 3.05rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+.voyage__toggle {
+  display: none;
+  visibility: hidden;
+  min-height: 44px;
+  min-width: 44px;
+  padding: 0 16px;
+  margin: 0 0 16px;
+  font: inherit;
+  font-weight: 500;
+  color: var(--v-ink);
+  background: var(--v-chart);
+  border: 2px solid var(--v-ink);
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 160ms var(--v-ease);
+}
+
+.voyage__toggle:hover {
+  background: var(--v-sun);
+}
+
+.voyage__toggle:focus-visible,
+.voyage__place a:focus-visible {
+  outline: 2px solid var(--v-ink);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 5px var(--v-sun);
+}
+
+.voyage[data-hydrated] .voyage__toggle {
+  visibility: visible;
+}
+
+.voyage__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-left: 2px solid var(--v-ink);
+}
+
+.voyage__stop {
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  padding: 16px 0 16px 16px;
+  border-bottom: 1px solid var(--v-fog);
+}
+
+.voyage__stop:last-child {
+  border-bottom: 0;
+}
+
+.voyage__badge {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border: 2px solid var(--v-ink);
+  border-radius: 50%;
+  background: var(--v-chart);
+}
+
+.voyage__badge img {
+  display: block;
+  width: 48px;
+  height: 24px;
+}
+
+.voyage__stop-text {
+  min-width: 0;
+}
+
+.voyage__place {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+
+.voyage__place a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: inherit;
+  text-decoration: none;
+  border-radius: 2px;
+}
+
+.voyage__place a:hover {
+  text-decoration: underline;
+  text-decoration-color: var(--v-sea);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.voyage__chapter,
+.voyage__role,
+.voyage__dates {
+  margin: 0;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.voyage__chapter {
+  font-weight: 500;
+}
+
+.voyage__role,
+.voyage__dates {
+  color: var(--v-ink-60);
+}
+
+/* ---------- Motion mode (desktop). Same condition as the GSAP matchMedia. */
+@media (scripting: enabled) and (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
+  .voyage__toggle {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__section {
+    height: 500vh; /* reserved: stage (100vh) + pin duration (400vh) */
+  }
+
+  .voyage:not([data-motion='off']) .voyage__stage {
+    position: sticky; /* the pin: composited, no pin-spacer, no layout shift */
+    top: 0;
+    height: 100vh;
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: minmax(360px, 30%) minmax(0, 1fr);
+  }
+
+  .voyage:not([data-motion='off']) .voyage__panel {
+    grid-column: 1;
+    grid-row: 1;
+    max-width: none;
+    margin: 0;
+    padding: 20px 24px 16px 32px;
+    border-right: 2px solid var(--v-ink);
+    background: var(--v-chart);
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__title {
+    font-size: 1.56rem;
+    margin-bottom: 8px;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__toggle {
+    margin-bottom: 12px;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__stop {
+    position: relative;
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 12px;
+    padding: 4px 0 4px 12px;
+  }
+
+  /* Active stop marker: a sun bar on the log-book rule. Opacity only, so the
+     text keeps full contrast whether or not its stop is active. */
+  .voyage:not([data-motion='off']) .voyage__stop::before {
+    content: '';
+    position: absolute;
+    left: -2px;
+    top: 0;
+    bottom: 0;
+    width: 6px;
+    background: var(--v-sun);
+    border: 2px solid var(--v-ink);
+    border-left-width: 0;
+    opacity: 0;
+    transition: opacity 200ms var(--v-ease);
+  }
+
+  .voyage:not([data-motion='off']) .voyage__stop[aria-current='step']::before {
+    opacity: 1;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__badge {
+    width: 40px;
+    height: 40px;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__badge img {
+    width: 36px;
+    height: 18px;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__place {
+    font-size: 1rem;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__place a {
+    min-height: 24px;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__chapter,
+  .voyage:not([data-motion='off']) .voyage__role,
+  .voyage:not([data-motion='off']) .voyage__dates {
+    font-size: 0.8125rem;
+    line-height: 1.25;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__place {
+    line-height: 1.15;
+  }
+
+  .voyage:not([data-motion='off']) .voyage__chapter,
+  .voyage:not([data-motion='off']) .voyage__role {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Visual layer: texture plane, wave plane (the two parallax planes), and
+     the chart with the route and the ship. */
+  .voyage:not([data-motion='off']) .voyage__visual {
+    display: block;
+    grid-column: 2;
+    grid-row: 1;
+    position: relative;
+    overflow: hidden;
+    contain: strict;
+  }
+
+  .voyage__plane {
+    position: absolute;
+    inset: -12% -6%;
+    will-change: transform;
+    pointer-events: none;
+  }
+
+  .voyage__plane--texture {
+    background: var(--v-chart) url('/voyage/chart-grid.svg') repeat;
+    background-size: 48px 48px;
+  }
+
+  .voyage__plane--waves {
+    background: url('/voyage/waves.svg') repeat;
+    background-size: 240px 160px;
+  }
+
+  .voyage__map {
+    position: absolute;
+    inset: 32px;
+  }
+
+  .voyage__route {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+
+  .voyage__route-line {
+    fill: none;
+    stroke: var(--v-sea);
+    stroke-width: 2;
+    stroke-dasharray: 10 8;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .voyage__port {
+    fill: var(--v-chart);
+    stroke: var(--v-ink);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .voyage__island circle {
+    fill: none;
+    stroke: var(--v-ink);
+    stroke-width: 2;
+    vector-effect: non-scaling-stroke;
+  }
+
+  .voyage__island .voyage__sun {
+    fill: var(--v-sun);
+  }
+
+  /* The ship is an HTML element outside the SVG; MotionPath aligns it. */
+  .voyage__ship {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 96px;
+    height: 48px;
+    will-change: transform;
+  }
+
+  .voyage__ship img {
+    position: absolute;
+    inset: 0;
+    width: 96px;
+    height: 48px;
+    opacity: 0;
+  }
+
+  .voyage__ship img[data-ship-sprite='small'] {
+    opacity: 1;
+  }
+}

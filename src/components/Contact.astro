@@ -1,0 +1,123 @@
+---
+// Chapter 5: Contact. Anchor: #contact. The CTA line, then email and phone as
+// real mailto:/tel: links (values from src/data/site.ts, never hardcoded), each
+// with a progressive copy button, then the résumé and the two profiles. The
+// values stay selectable text, so they work with no JavaScript at all. The
+// phone number lives here in the body only; it never goes into <head>.
+import LogbookSection from './LogbookSection.astro';
+import CopyButton from './CopyButton.astro';
+import { actions, contact } from '../data/site';
+
+const ways = [
+  { id: 'contact-email', kind: 'Email', ...contact.email, copyLabel: 'Copy email address' },
+  { id: 'contact-phone', kind: 'Phone', ...contact.phone, copyLabel: 'Copy phone number' },
+];
+---
+<LogbookSection id="contact" chapter="5" title="Contact">
+  <p class="cta">{contact.ctaLine}</p>
+  <ul class="rows" role="list">
+    {
+      ways.map((w) => (
+        <li class="row">
+          <span class="kind">{w.kind}</span>
+          <a class="value" id={w.id} href={w.href}>{w.display}</a>
+          <CopyButton value={w.display} label={w.copyLabel} target={w.id} />
+        </li>
+      ))
+    }
+  </ul>
+  <p class="status" aria-live="polite" data-copy-status></p>
+  <ul class="links" role="list" aria-label="Résumé and profiles">
+    {
+      actions.map((a) => (
+        <li>
+          <a
+            href={a.href}
+            download={a.download ? '' : undefined}
+            target={a.external ? '_blank' : undefined}
+            rel={a.external ? 'noopener' : undefined}
+          >
+            {a.download ? 'Download the résumé (PDF)' : a.label}
+            {a.external && <span class="visually-hidden"> (opens in a new tab)</span>}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</LogbookSection>
+
+<style>
+  .cta {
+    max-width: 40ch;
+    font-size: var(--t-1);
+    font-weight: 500;
+    line-height: 1.3;
+  }
+
+  .rows {
+    width: 100%;
+    max-width: 40rem;
+    border-top: var(--rule);
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    grid-template-areas:
+      'kind kind'
+      'value copy';
+    align-items: center;
+    column-gap: var(--s-4);
+    padding-block: var(--s-3);
+    border-bottom: var(--hairline);
+  }
+
+  .kind {
+    grid-area: kind;
+    color: var(--ink-60);
+    font-size: var(--t-small);
+  }
+
+  .value {
+    grid-area: value;
+    display: inline-flex;
+    align-items: center;
+    justify-self: start;
+    min-height: var(--tap);
+    min-width: var(--tap);
+    font-size: var(--t-1);
+    font-weight: 500;
+    overflow-wrap: anywhere;
+  }
+
+  .row :global(.copy) {
+    grid-area: copy;
+  }
+
+  .status {
+    min-height: 1.55em;
+    color: var(--ink-60);
+    font-size: var(--t-small);
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-1) var(--s-5);
+  }
+
+  .links a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--tap);
+    min-width: var(--tap);
+    font-weight: 500;
+  }
+
+  @media (min-width: 768px) {
+    .row {
+      grid-template-columns: 5rem 1fr auto;
+      grid-template-areas: 'kind value copy';
+    }
+  }
+</style>
