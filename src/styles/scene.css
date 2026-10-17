@@ -1,0 +1,55 @@
+/* The 3D voyage layer. The canvas is fixed behind the page; the page keeps its
+   own stacking context above it. Nothing here changes any layout box. */
+.scene-root {
+  display: contents;
+}
+
+.scene-canvas {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Behind every in-flow box of the page, above the root background. No
+     ancestor of the canvas creates a stacking context, so this is the root's. */
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 400ms var(--ease);
+}
+
+[data-scene-live] .scene-canvas {
+  opacity: 1;
+}
+
+/* body paints its own background above a z-index -1 layer; while the scene is
+   live the chart colour stays on html (the root background, painted beneath
+   the canvas) and body goes clear. */
+html:has([data-scene-live]) body {
+  background: transparent;
+}
+
+.scene-pause {
+  position: fixed;
+  right: var(--gutter);
+  bottom: var(--s-5);
+  z-index: 5;
+  min-height: var(--tap);
+  padding: 0 var(--s-4);
+  font: inherit;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--chart);
+  border: var(--rule);
+  border-radius: var(--r);
+  cursor: pointer;
+}
+
+.scene-pause:hover { background: var(--sun); }
+.scene-pause:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; box-shadow: 0 0 0 5px var(--sun); }
+
+/* Spike only: sections keep their backgrounds, so the sea shows where the page
+   is transparent; plan 2 restyles chapters into paper cards over the sea. */
+
+/* Art review: ?scene=solo hides the page so the scene can be judged alone. */
+html[data-scene-solo] main, html[data-scene-solo] footer { visibility: hidden; }
+html[data-scene-solo] .scene-canvas { visibility: visible; }

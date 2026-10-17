@@ -166,9 +166,67 @@ describe('VoyageTimeline [unit]', () => {
     expect(findCopyViolations(stripTags(html))).toEqual([]);
   });
 
-  it('ships no client script of its own', async () => {
+  it('adds no inline script of its own; Astro’s island plumbing is the only client code', async () => {
     const html = await render();
-    expect(html).not.toMatch(/<script\b/);
+    const scripts = html.match(/<script\b[\s\S]*?<\/script>/g) ?? [];
+    for (const s of scripts) expect(s).toMatch(/astro-island|astro:/);
+    expect(html).not.toMatch(/<script\b[^>]*>[^<]*voyage/i);
+  });
+});
+
+describe('The desktop island around the timeline [unit]', () => {
+  // Build-Phase 5: the island WRAPS the Phase 4 chart and list as slots. It
+  // hydrates only under the desktop motion media query (client:media), so a
+  // phone or a reduced-motion visitor never downloads React or GSAP.
+  it('hydrates only under the desktop motion media query', async () => {
+    const html = await render();
+    const island = html.match(/<astro-island\b[^>]*>/)?.[0] ?? '';
+    expect(island).not.toBe('');
+    expect(island).toMatch(/\bclient="media"/);
+    const decoded = island.replace(/&quot;/g, '"').replace(/&#34;/g, '"');
+    expect(decoded).toContain('(min-width: 1024px)');
+    expect(decoded).toContain('(prefers-reduced-motion: no-preference)');
+    expect(html.match(/<astro-island\b/g)).toHaveLength(1);
+  });
+
+  it('keeps the chart and the list inside the island, chart first', async () => {
+    const html = await render();
+    const islandStart = html.search(/<astro-island\b/);
+    const islandEnd = html.indexOf('</astro-island>');
+    const chartAt = html.search(/<svg\b[^>]*data-voyage-chart/);
+    const listAt = html.search(/<ol\b[^>]*data-voyage-list/);
+    expect(chartAt).toBeGreaterThan(islandStart);
+    expect(listAt).toBeGreaterThan(chartAt);
+    expect(listAt).toBeLessThan(islandEnd);
+  });
+
+  it('marks chapter, role and dates on every stop as details for the staged reveal', async () => {
+    const html = await render();
+    for (const li of items(html)) {
+      expect(li.match(/data-stop-detail/g)).toHaveLength(3);
+    }
+  });
+
+  it('server-renders the pause toggle unpressed and the ship sprites with empty alt', async () => {
+    const html = await render();
+    const toggle = html.match(/<button\b[^>]*data-voyage-toggle[^>]*>[\s\S]*?<\/button>/)?.[0] ?? '';
+    expect(toggle).not.toBe('');
+    expect(toggle).toContain('aria-pressed="false"');
+    expect(stripTags(toggle).trim()).toBe('Pause the voyage');
+    const sprites = [...html.matchAll(/<img\b[^>]*data-ship-sprite[^>]*>/g)].map((m) => m[0]);
+    expect(sprites).toHaveLength(3);
+    for (const img of sprites) {
+      expect(img).toContain('alt=""');
+      expect(img).toContain('loading="lazy"');
+    }
+    // Sprites are decorative; the badges in the list remain the labelled ones.
+    expect(html.match(/data-ship-badge/g)).toHaveLength(stops.length);
+  });
+
+  it('the island root is a div, so the chapter section still closes the markup', async () => {
+    const html = await render();
+    expect(html).toMatch(/<div\b[^>]*data-voyage-root[^>]*data-motion="on"/);
+    expect(html.match(/<section\b/g)).toHaveLength(1);
   });
 });
 

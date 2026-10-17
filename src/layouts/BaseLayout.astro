@@ -3,9 +3,14 @@
 //   title: string            — page <title>
 //   description?: string     — meta description
 //   noindex?: boolean        — adds <meta name="robots" content="noindex"> (lab routes)
+//   jsonLd?: object          — a schema.org record written as JSON-LD (home: Person)
 // Renders: skip link, ruled header with the three actions, <main id="main">,
 // footer, the fixed mobile action bar, and Vercel Speed Insights. No other JS.
+// Indexable pages also get the Open Graph / Twitter card tags; the image is
+// /og.png, rendered at build time (src/pages/og.png.ts). The phone number is
+// never in the head (contact.test.ts).
 import '../styles/global.css';
+import '../styles/scene.css';
 import displayFontUrl from '../styles/fonts/archivo-expanded-800.woff2?url';
 import SpeedInsights from '@vercel/speed-insights/astro';
 import SiteHeader from '../components/SiteHeader.astro';
@@ -15,10 +20,13 @@ interface Props {
   title: string;
   description?: string;
   noindex?: boolean;
+  jsonLd?: Record<string, unknown>;
 }
-const { title, description = 'Rajat Arora, AI Engineer in Austin, TX.', noindex = false } = Astro.props;
+const { title, description = 'Rajat Arora, AI Engineer in Austin, TX.', noindex = false, jsonLd } = Astro.props;
 const site = Astro.site ?? new URL('https://rajatarora.com');
 const canonical = new URL(Astro.url.pathname, site).href;
+const ogImage = new URL('/og.png', site).href;
+const ogImageAlt = 'Rajat Arora, AI Engineer. I build AI products that work in production, and I prove it.';
 ---
 <!doctype html>
 <html lang="en">
@@ -29,9 +37,31 @@ const canonical = new URL(Astro.url.pathname, site).href;
     <meta name="description" content={description} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     {!noindex && <link rel="canonical" href={canonical} />}
+    {
+      !noindex && (
+        <>
+          <meta property="og:type" content="website" />
+          <meta property="og:site_name" content="Rajat Arora" />
+          <meta property="og:title" content={title} />
+          <meta property="og:description" content={description} />
+          <meta property="og:url" content={canonical} />
+          <meta property="og:image" content={ogImage} />
+          <meta property="og:image:width" content="1200" />
+          <meta property="og:image:height" content="630" />
+          <meta property="og:image:alt" content={ogImageAlt} />
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta name="twitter:title" content={title} />
+          <meta name="twitter:description" content={description} />
+          <meta name="twitter:image" content={ogImage} />
+        </>
+      )
+    }
+    {jsonLd && <script type="application/ld+json" is:inline set:html={JSON.stringify(jsonLd)} />}
     <link rel="preload" href={displayFontUrl} as="font" type="font/woff2" crossorigin />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#F4F6F3" />
+    <script is:inline>if (new URLSearchParams(location.search).get('scene') === 'solo') document.documentElement.setAttribute('data-scene-solo', '');</script>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>

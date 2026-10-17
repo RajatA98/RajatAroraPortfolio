@@ -40,7 +40,11 @@ Thresholds, local commands, and the manual checks that are not in CI are documen
 
 ## Security headers
 
-`vercel.json` sets HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options`, and a Content Security Policy in report-only mode. Hashed build assets under `/_astro/` are cached for a year as immutable; the resume PDF keeps a stable URL with a short cache.
+`vercel.json` sets HSTS, `X-Content-Type-Options`, `Referrer-Policy`, `Permissions-Policy`, `X-Frame-Options` and `Content-Security-Policy: frame-ancestors 'none'`. The rest of the Content Security Policy is enforced from the page itself: Astro hashes every inline script and style it emits into a `<meta http-equiv>` policy with no `unsafe-inline` (`security.csp` in `astro.config.mjs`). Hashed build assets under `/_astro/` are cached for a year as immutable; the resume PDF keeps a stable URL with a short cache.
+
+## Link previews, structured data, colophon
+
+`/og.png` is rendered at build time from the site data (satori + resvg, `src/og/card.ts`) and referenced by the Open Graph and Twitter tags; `/robots.txt` and `/apple-touch-icon.png` are generated the same way; the home page carries a schema.org `Person` record (no telephone). `/colophon` states the licenses, the AI-art disclosure and the privacy line.
 
 ## Licenses
 

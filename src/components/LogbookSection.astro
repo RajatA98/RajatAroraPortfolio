@@ -12,7 +12,7 @@ interface Props {
 }
 const { id, chapter, title, class: className } = Astro.props;
 ---
-<section id={id} class:list={['chapter-section', className]} aria-labelledby={`${id}-title`}>
+<section id={id} class:list={['chapter-section', className]} aria-labelledby={`${id}-title`} data-scene-chapter={id}>
   <div class="wrap logbook">
     <span class="chapter" aria-hidden="true">{chapter}</span>
     <div class="page">

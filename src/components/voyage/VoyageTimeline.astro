@@ -6,15 +6,19 @@
 // marked where the ship changes size. Above the list on wide screens, the route
 // is drawn once as a still chart (a decorative motif, never a pannable map).
 //
-// CONTRACT with Build-Phase 5: the desktop island server-renders THIS markup
-// (ol[data-voyage-list] > li[data-stop-id]#stop-<id], a[data-stop-place],
-// img[data-ship-badge]) and enhances it in place by setting attributes. The
-// semantic nodes are never replaced. No GSAP mounts below 1024px, ever.
+// CONTRACT with Build-Phase 5 (now in force): the chart and the list below are
+// passed to the desktop island as slots. Astro keeps slot HTML static, so the
+// island never re-renders these nodes; it only sets attributes (aria-current)
+// and inline transform/opacity on them, and reverts both when it unmounts.
+// The island hydrates with client:media on the desktop motion query, so a
+// phone or a reduced-motion visitor never downloads React or GSAP, and no GSAP
+// mounts below 1024px, ever.
 import LogbookSection from '../LogbookSection.astro';
 import type { Stop } from '../../data/stops';
 import { shipSprite } from '../../data/ship-size';
 import { formatDates } from './format-dates';
 import { buildRoute, type Point } from './route';
+import Voyage, { MOTION_QUERY } from './Voyage';
 
 interface Props {
   stops: readonly Stop[];
@@ -35,9 +39,11 @@ const last = charted.at(-1);
     graduated, and at the turning point when I moved into AI engineering full time.
   </p>
 
+  <Voyage client:media={MOTION_QUERY} stops={stops}>
   {
     route && (
       <svg
+        slot="chart"
         class="chart"
         data-voyage-chart
         viewBox="0 0 1000 600"
@@ -60,7 +66,7 @@ const last = charted.at(-1);
     )
   }
 
-  <ol class="stops" data-voyage-list>
+  <ol slot="list" class="stops" data-voyage-list>
     {
       stops.map((stop) => (
         <li
@@ -87,14 +93,15 @@ const last = charted.at(-1);
                 {stop.place}
               </a>
             </h3>
-            <p class="chapter-name">{stop.chapter}</p>
-            <p class="role">{stop.role}</p>
-            <p class="dates">{formatDates(stop.dates)}</p>
+            <p class="chapter-name" data-stop-detail>{stop.chapter}</p>
+            <p class="role" data-stop-detail>{stop.role}</p>
+            <p class="dates" data-stop-detail>{formatDates(stop.dates)}</p>
           </div>
         </li>
       ))
     }
   </ol>
+  </Voyage>
 </LogbookSection>
 
 <style>

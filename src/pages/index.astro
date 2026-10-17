@@ -10,17 +10,37 @@ import CaptainsLog from '../components/log/CaptainsLog.astro';
 import VoyageTimeline from '../components/voyage/VoyageTimeline.astro';
 import About from '../components/About.astro';
 import Contact from '../components/Contact.astro';
+import Voyage3D from '../components/scene/Voyage3D';
+import { SCENE_QUERY } from '../components/scene/mount';
 import type { LogEntryData } from '../data/case-study';
 import { stops } from '../data/stops';
+import { actions, contact, name } from '../data/site';
 
 const entries: LogEntryData[] = (await getCollection('caseStudies', ({ data }) => !data.draft))
   .sort((a, b) => a.data.order - b.data.order)
   .map((e) => ({ id: e.id, study: e.data }));
+const berths = entries.map((e) => ({ id: e.id, classified: e.study.kind === 'classified' }));
+
+// Structured data for the home page: a Person with the public profiles and the
+// email. No telephone, by owner decision (the phone is on the page, not in data).
+const site = Astro.site ?? new URL('https://rajatarora.com');
+const person = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name,
+  jobTitle: 'AI Engineer',
+  url: site.href,
+  email: contact.email.href,
+  address: { '@type': 'PostalAddress', addressLocality: 'Austin', addressRegion: 'TX', addressCountry: 'US' },
+  sameAs: actions.filter((a) => a.external).map((a) => a.href),
+};
 ---
 <BaseLayout
   title="Rajat Arora, AI Engineer"
   description="Rajat Arora builds AI products that work in production. AI Engineer in Austin, TX, available now."
+  jsonLd={person}
 >
+  <Voyage3D client:media={SCENE_QUERY} stops={stops} berths={berths} />
   <Hero />
   <CaptainsLog entries={entries} />
   <VoyageTimeline stops={stops} />

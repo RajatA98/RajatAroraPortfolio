@@ -4,7 +4,7 @@
 // numbers. Exits 1 when the bar is missed: median < 50 fps or any frame > 32 ms.
 //
 // Usage: node scripts/fps-from-trace.mjs [trace.json]
-//        (default factory/artifacts/qa/traces/voyage-spike.trace.json)
+//        (default factory/artifacts/qa/traces/scene-spike.trace.json)
 //
 // Which events, and why:
 //  - Window: between the `TimeStamp` events "voyage-scroll-start" and
@@ -24,7 +24,7 @@
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const file = resolve(process.argv[2] ?? 'factory/artifacts/qa/traces/voyage-spike.trace.json');
+const file = resolve(process.argv[2] ?? 'factory/artifacts/qa/traces/scene-spike.trace.json');
 const raw = JSON.parse(readFileSync(file, 'utf8'));
 const events = Array.isArray(raw) ? raw : raw.traceEvents;
 if (!Array.isArray(events)) {
@@ -43,12 +43,17 @@ if (start === undefined || end === undefined) {
   start = Math.min(...begins);
   end = Math.max(...begins);
 }
-// Open the window at the first wheel input, so the idle vsyncs before the
-// gesture starts are not counted as slow scroll frames.
-const firstWheel = events
+// Open the window at the first wheel input and close it at the last one, so
+// the idle vsyncs before the gesture starts and after it ends (the compositor
+// simply has nothing to draw once input stops) are not counted as slow scroll
+// frames. What is measured is every frame while the visitor is scrolling.
+const wheels = events
   .filter((e) => e.name === 'EventDispatch' && e.args?.data?.type === 'wheel' && e.ts >= start && e.ts <= end)
-  .reduce((m, e) => Math.min(m, e.ts), Infinity);
-if (Number.isFinite(firstWheel)) start = firstWheel;
+  .map((e) => e.ts);
+if (wheels.length) {
+  start = Math.min(...wheels);
+  end = Math.max(...wheels);
+}
 
 const draws = events.filter((e) => e.name === 'DrawFrame' && e.ts >= start && e.ts <= end);
 const byThread = new Map();

@@ -1,7 +1,7 @@
 [
   {
-    "name": "All client JS (Astro runtime + React + GSAP + Voyage island)",
-    "path": "dist/_astro/*.js",
+    "name": "Phone and first-paint client JS (Astro runtime, React, the 2D voyage island)",
+    "path": ["dist/_astro/*.js", "!dist/_astro/three*.js", "!dist/_astro/scene*.js"],
     "limit": "150 kB",
     "gzip": true
   },
@@ -9,6 +9,12 @@
     "name": "GSAP chunk",
     "path": "dist/_astro/gsap*.js",
     "limit": "60 kB",
+    "gzip": true
+  },
+  {
+    "name": "Desktop deferred bundle (Three.js, GSAP, the 3D scene)",
+    "path": ["dist/_astro/three*.js", "dist/_astro/scene*.js", "dist/_astro/gsap*.js"],
+    "limit": "400 kB",
     "gzip": true
   }
 ]

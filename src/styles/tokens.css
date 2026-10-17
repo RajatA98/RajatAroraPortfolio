@@ -11,6 +11,18 @@
   --sun: #f2a93b;
   --signal: #c7302b;
   --fog: #d5dbd7;
+  /* Scene colours (Design Plan v2 §2.1): the 3D world and the painted 2D page.
+     Each material is a base plus one darker step; no gradients inside a material. */
+  --sea-deep: #124E63;
+  --sea-light: #4FA3BD;
+  --sky-dawn: #F7D6A8;
+  --sky-day: #BFE3EE;
+  --sky-late: #F3B98C;
+  --sand: #E9D9B0;
+  --leaf: #4F8A5B;
+  --leaf-deep: #2F5E3B;
+  --timber: #9C6B3C;
+  --timber-deep: #6B4426;
 
   /* Type */
   --font-display: 'Archivo Expanded', 'Archivo Expanded Fallback', 'Arial Black', sans-serif;

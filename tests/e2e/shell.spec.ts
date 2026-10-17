@@ -3,7 +3,7 @@ import AxeBuilder from '@axe-core/playwright';
 
 // Paths that must render the full shell. `/404` is the built 404.html; the
 // unknown path checks that preview falls back to the same page.
-const PATHS = ['/', '/404', '/no-such-page'];
+const PATHS = ['/', '/colophon', '/404', '/no-such-page'];
 const ACTIONS = ['resume', 'linkedin', 'github'] as const;
 
 async function visibleActionBar(page: Page) {
@@ -46,16 +46,26 @@ for (const path of PATHS) {
       }
     });
 
-    test('mobile bottom bar shows only below 768px', async ({ page }) => {
-      const dock = page.locator('[data-action-bar][aria-label="Quick actions"]');
-      await page.setViewportSize({ width: 390, height: 844 });
-      // WebKit can report the old viewport for a moment after the resize.
-      await expect.poll(() => page.evaluate(() => window.innerHeight)).toBe(844);
-      await expect(dock).toBeVisible();
-      const box = await dock.boundingBox();
-      expect(box!.y + box!.height).toBeCloseTo(844, 0);
-      await page.setViewportSize({ width: 1024, height: 800 });
-      await expect(dock).toBeHidden();
+    test('mobile bottom bar shows only below 768px', async ({ browser }) => {
+      // Fresh contexts at explicit sizes, never a resize: resizing a
+      // mobile-emulated WebKit page leaves innerHeight, the layout viewport and
+      // a fixed bar disagreeing for a while, differently on short and long pages.
+      const dockOn = async (viewport: { width: number; height: number }) => {
+        const ctx = await browser.newContext({ viewport });
+        const p = await ctx.newPage();
+        await p.goto(path);
+        return { ctx, dock: p.locator('[data-action-bar][aria-label="Quick actions"]') };
+      };
+
+      const narrow = await dockOn({ width: 390, height: 844 });
+      await expect(narrow.dock).toBeVisible();
+      const box = await narrow.dock.boundingBox();
+      expect(Math.round(box!.y + box!.height)).toBe(844);
+      await narrow.ctx.close();
+
+      const wide = await dockOn({ width: 1024, height: 800 });
+      await expect(wide.dock).toBeHidden();
+      await wide.ctx.close();
     });
 
     test('Tab reaches the skip link first, then the three actions', async ({ page, browserName }) => {

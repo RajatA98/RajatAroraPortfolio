@@ -135,7 +135,7 @@ PW_PORT=4330 ASTRO_OUT_DIR=dist-local npx playwright test
 - `X-Frame-Options: DENY`
 - `Content-Security-Policy-Report-Only` allowing self, inline scripts and styles (Astro island hydration uses inline scripts), Vercel Speed Insights script and beacon hosts, `data:` images, and blocking framing. It is report-only so later work builds under it without breaking; it may be tightened later if cheap.
 
-Caching: `/_astro/*` is `public, max-age=31536000, immutable` (content-hashed names). The resume PDF has a stable path with `public, max-age=300, must-revalidate` so updates show up within minutes. `/lab/*` routes carry `X-Robots-Tag: noindex, nofollow`.
+Caching: `/_astro/*` is `public, max-age=31536000, immutable` (content-hashed names). The resume PDF has a stable path with `public, max-age=300, must-revalidate` so updates show up within minutes. `/lab/*` routes carry `X-Robots-Tag: noindex, nofollow` (none exist since Build-Phase 5; the rule is kept for future lab pages). Content Security Policy: enforced, in two parts. Astro's `security.csp` writes a `<meta http-equiv="Content-Security-Policy">` into every page with a hash for each inline script and style it emits, so the policy is `default-src 'self'` with no `unsafe-inline`; `vercel.json` adds `frame-ancestors 'none'`, which a meta tag cannot carry. `tests/e2e/launch.spec.ts` loads the home page, uses the copy button and the voyage, and fails on any `securitypolicyviolation`.
 
 Verify on a deploy with `curl -I https://rajatarora.com/`.
 
@@ -147,7 +147,7 @@ These need a human, a real device, or judgment. Results are recorded in a privat
 
 | Protocol | When | Pass bar |
 | --- | --- | --- |
-| **Frame-rate trace** | After any change to the voyage animation | Chrome DevTools Performance panel, 4x CPU throttle, one full scroll-through, trace JSON saved and summarized with `scripts/fps-from-trace.mjs`: at least 50 fps median, no frame over 32 ms, zero layout shift at island mount. Repeat in Safari. |
+| **Frame-rate trace** | After any change to the 3D voyage scene (and the 2D voyage animation) | `node scripts/perf-trace.mjs` against `astro preview` of the build, on `/?voyage=debug` (the query exposes the scene's `window.__scene` hook; the script fails if the scene is not `live`, which on that machine is a NO-GO): Chrome, 4x CPU throttle, 1440×900, one full scroll-through of the home page. Summarise with `node scripts/fps-from-trace.mjs` (the window runs from the first to the last wheel input): at least 50 fps median, no frame over 32 ms, zero layout shift at island mount. Run it on a mid laptop, not only a fast one, and repeat in Safari by hand. Art review: `/?voyage=debug&scene=solo` hides the page so the scene can be judged alone. |
 | **WebPageTest, Moto G** | Launch gate | Free tier, real Moto G profile, median of 3 runs: LCP under 2.0 s and CLS under 0.1. This is the real performance measurement; the Lighthouse CI LCP number is only a proxy. |
 | **Skeptic sign-off** | Launch gate | A named non-fan skeptic, shown the hero, rates it "serious engineer", not "gimmick portfolio". |
 | **5-second exposure test** | Launch gate | At least two first-time viewers (one non-technical, one on mobile) can say who he is, that he is available and roughly where, and where to find the resume and work. |

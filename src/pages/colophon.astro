@@ -1,0 +1,126 @@
+---
+// Colophon (Build-Phase 6): how the site was built, what it uses, what it does
+// not do. The license notices, the AI-art disclosure and the privacy line the
+// Plan requires live here, in plain words. Indexable; linked from the footer.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import RouteMark from '../components/RouteMark.astro';
+
+const repo = 'https://github.com/RajatA98/RajatAroraPortfolio';
+---
+<BaseLayout
+  title="Colophon, Rajat Arora"
+  description="How this site was built: Astro, one animated island, self-hosted type, no cookies, and the checks that run on every change."
+>
+  <article class="wrap colophon">
+    <header class="intro">
+      <RouteMark class="mark" />
+      <h1>Colophon</h1>
+      <p class="lede">How this site was built, what it uses, and what it does not do.</p>
+    </header>
+
+    <section aria-labelledby="built-title">
+      <h2 id="built-title">Built as proof</h2>
+      <p>
+        The site is a static <a href="https://astro.build">Astro</a> build with strict TypeScript. One React island
+        runs the animated voyage, and it loads <a href="https://gsap.com">GSAP</a> on demand, only on a wide screen with
+        motion allowed. Phones and readers who prefer reduced motion get the same chapter as plain HTML and never
+        download the animation code. Beyond that island, the only scripts are a small copy helper on the contact
+        chapter and the performance beacon described below.
+      </p>
+      <p>
+        Every change runs the same checks before it can ship: a type check, unit tests, a scan of the source and
+        the build output for terms that must not appear, a JavaScript size budget, browser tests with keyboard,
+        reduced-motion and accessibility checks, and Lighthouse budgets for bytes, layout shift and an accessibility
+        score of 100. The thresholds are documented in the repository.
+      </p>
+    </section>
+
+    <section aria-labelledby="type-title">
+      <h2 id="type-title">Type</h2>
+      <p>
+        The typeface is Archivo by Omnibus-Type, used under the SIL Open Font License 1.1. Two subsets are
+        self-hosted here: an expanded 800 weight for display and a 400 to 500 range for text. No fonts are loaded
+        from a third party.
+      </p>
+    </section>
+
+    <section aria-labelledby="motion-title">
+      <h2 id="motion-title">Motion</h2>
+      <p>
+        The voyage is animated with GSAP 3 and its ScrollTrigger plugin under the GSAP standard no-charge license.
+        Everything else on the site only moves in answer to an action.
+      </p>
+    </section>
+
+    <section aria-labelledby="art-title">
+      <h2 id="art-title">Art</h2>
+      <p>
+        The route mark, the chart, the ports and the three ship drawings are original work made for this site. The
+        portrait in the first chapter is a placeholder today. The planned portrait is an original character,
+        AI-assisted and hand-finished. No franchise assets are used anywhere on the site, and a check for that runs
+        on every build.
+      </p>
+    </section>
+
+    <section aria-labelledby="privacy-title">
+      <h2 id="privacy-title">Privacy</h2>
+      <p>
+        No cookies, no trackers, no advertising. The only measurement is anonymous page-performance data collected
+        by Vercel Speed Insights, which records how fast pages load and nothing about who you are. The contact
+        details on the site are published on purpose, so that you can reach me.
+      </p>
+    </section>
+
+    <section aria-labelledby="source-title">
+      <h2 id="source-title">Source</h2>
+      <p>
+        The site is open source. The code, the tests and the checks are all in
+        <a href={repo}>the repository on GitHub</a>, so the claims on this page can be read rather than taken on trust.
+      </p>
+    </section>
+  </article>
+</BaseLayout>
+
+<style>
+  .colophon {
+    display: grid;
+    gap: var(--s-6);
+    padding-block: var(--s-8) 0;
+    max-width: calc(var(--measure) + 2 * var(--gutter));
+    margin-inline: 0;
+  }
+
+  .intro {
+    display: grid;
+    gap: var(--s-4);
+    justify-items: start;
+  }
+
+  .intro :global(.mark) {
+    max-width: 10rem;
+  }
+
+  h1 {
+    font-size: var(--t-4);
+  }
+
+  h2 {
+    font-size: var(--t-2);
+    margin-bottom: var(--s-3);
+  }
+
+  .lede,
+  section p {
+    max-width: var(--measure);
+  }
+
+  section p + p {
+    margin-top: var(--s-3);
+  }
+
+  @media (min-width: 1024px) {
+    .colophon {
+      margin-inline: auto;
+    }
+  }
+</style>

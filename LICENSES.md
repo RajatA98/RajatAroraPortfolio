@@ -9,7 +9,12 @@
 - **Files in this repo** (`src/styles/fonts/`), cut with fontTools (`varLib.instancer`, then `subset` to Basic Latin, Latin-1 and common punctuation):
   - `archivo-expanded-800.woff2`: static instance at width 125, weight 800 (display face, preloaded).
   - `archivo-400-500.woff2`: variable instance at width 100, weight 400 to 500 (body face).
+- `src/og/fonts/archivo-expanded-800.ttf` and `src/og/fonts/archivo-500.ttf`: static TTF instances (width 125 / weight 800, and width 100 / weight 500), subset to Basic Latin plus a few accents and quotes, cut from the same source for the build-time Open Graph card (`src/og/card.ts`; satori cannot read WOFF2). Never served to visitors.
 - These modified files are distributed under the same OFL 1.1 terms.
+
+## satori and resvg (Open Graph card, build time only)
+
+- **satori** (Vercel, MIT) lays out the card; **@resvg/resvg-js** (MIT) rasterises it to PNG during `astro build`. Neither ships to the browser.
 
 ## GSAP (animation library)
 
